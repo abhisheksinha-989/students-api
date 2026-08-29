@@ -9,7 +9,6 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
 	"github.com/abhisheksinha-989/students-api/internal/config"
 	"github.com/abhisheksinha-989/students-api/internal/http/handlers/student"
 	"github.com/abhisheksinha-989/students-api/internal/storage/sqlite"
@@ -31,6 +30,7 @@ func main() {
 	router := http.NewServeMux()
 	router.HandleFunc("POST /api/students", student.New(storage))
 	router.HandleFunc("GET /api/students/{id}", student.GetById(storage))
+	router.HandleFunc("GET /api/students", student.GetList(storage))
 
 	// setup server
 	server := http.Server{
