@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/abhisheksinha-989/students-api/internal/storage"
@@ -55,8 +56,23 @@ func (s *Postgres) CreateStudent(name string, email string, age int) (int64, err
 	return id, nil
 }
 
-// Read
-func (s *Postgres) GetStudentById(id int64) ([]types.Student, error) {
+// Read One
+func (s *Postgres) GetStudentById(id int64) (types.Student, error) {
+	query := `SELECT id, name, email, age FROM students WHERE id = $1`
+
+	var student types.Student
+	err := s.Db.QueryRow(query, id).Scan(&student.Id, &student.Name, &student.Email, &student.Age)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return types.Student{}, storage.ErrStudentNotFound
+		}
+		return types.Student{}, err
+	}
+	return student, nil
+}
+
+// Read All
+func (s *Postgres) GetStudents() ([]types.Student, error) {
 	query := `SELECT id, name, email, age FROM students ORDER BY id`
 
 	rows, err := s.Db.Query(query)
@@ -66,7 +82,6 @@ func (s *Postgres) GetStudentById(id int64) ([]types.Student, error) {
 	defer rows.Close()
 
 	var students []types.Student
-
 	for rows.Next() {
 		var student types.Student
 		if err := rows.Scan(&student.Id, &student.Name, &student.Email, &student.Age); err != nil {
@@ -74,7 +89,6 @@ func (s *Postgres) GetStudentById(id int64) ([]types.Student, error) {
 		}
 		students = append(students, student)
 	}
-
 	return students, nil
 }
 

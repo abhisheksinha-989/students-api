@@ -170,14 +170,14 @@ func Delete(store storage.Storage) http.HandlerFunc {
 		if err != nil {
 			if errors.Is(err, storage.ErrStudentNotFound) {
 				response.WriteJson(w, http.StatusNotFound, response.GeneralError(err))
-				return 
+				return
 			}
 
-			slog.Error("failed to delete student", slog.Int64("id",id), slog.String("error", err.Error()))
+			slog.Error("failed to delete student", slog.Int64("id", id), slog.String("error", err.Error()))
 			response.WriteJson(w, http.StatusInternalServerError, response.GeneralError(err))
-			return 
+			return
 		}
-		slog.Info("student deleted", slog.Int64("id",id))
-		response.WriteJson(w, http.StatusOK, map[string]string{"message": fmt.Sprintf("student %d deleted sucessfully")})
+		slog.Info("student deleted", slog.Int64("id", id))
+		response.WriteJson(w, http.StatusOK, map[string]string{"message": fmt.Sprintf("student %d deleted sucessfully", id)})
 	}
 }
